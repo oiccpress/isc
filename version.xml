@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE version SYSTEM "../../../lib/pkp/dtd/pluginVersion.dtd">
+
+<!--
+  * vplugins/importexport/isc/ersion.xml
+  *
+  * Copyright (c) 2024 Invisible Dragon Ltd
+  *
+  * Plugin version information.
+  -->
+<version>
+	<application>isc</application>
+	<type>plugins.importexport</type>
+	<release>1.0</release>
+	<date>2024-11-16</date>
+</version>

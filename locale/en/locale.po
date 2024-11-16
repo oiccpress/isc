@@ -1,0 +1,15 @@
+msgid "plugins.importexport.isc.displayName"
+msgstr "ISC (Islamic World Science Citation Center) XML Export"
+
+msgid "plugins.importexport.isc.description.short"
+msgstr "Export issues in the ISC XML format"
+
+msgid "plugins.importexport.isc.export.issues"
+msgstr "Export Issues"
+
+msgid "plugins.importexport.isc.export.failure.noIssueSelected"
+msgstr "No issue selected to export"
+
+msgid "plugins.importexport.isc.export.failure.loadingIssue"
+msgstr "Cannot load issue"
+
