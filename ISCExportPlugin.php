@@ -208,6 +208,8 @@ class ISCExportPlugin extends ImportExportPlugin
             $output[] = '</ARTICLES>';
         }
 
+        $output[] = '</XML>';
+
         return implode("\n", $output);
     }
 
