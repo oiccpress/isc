@@ -27,6 +27,8 @@ class ISCExportPlugin extends ImportExportPlugin
     /** @var Context the current context */
     private $_context;
 
+    private $_file_parts = [];
+
     /**
      * @copydoc ImportExportPlugin::display()
      */
@@ -53,6 +55,11 @@ class ISCExportPlugin extends ImportExportPlugin
                 try {
                     // create zip file
                     $file = $this->_createFile($issueIds);
+                    if ($request->getUserVar('type') == 'view') {
+                        header('content-type: text/plain; charset=UTF-8');
+                        echo $file;
+                        exit();
+                    }
                     $this->_download($file);
                 } catch (\Exception $e) {
                     $templateManager->assign('iscErrorMessage', $e->getMessage());
@@ -80,7 +87,7 @@ class ISCExportPlugin extends ImportExportPlugin
      */
     private function _createFilename(): string
     {
-        return $this->_context->getLocalizedSetting('acronym') . '_isc_' . date('Y-m-d-H-i-s') . '.xml';
+        return $this->_context->getLocalizedSetting('acronym') . '_' . implode('_', $this->_file_parts) . '_isc_' . date('Y-m-d-H-i-s') . '.xml';
     }
 
     /**
@@ -90,9 +97,8 @@ class ISCExportPlugin extends ImportExportPlugin
      */
     private function _download(string $path): void
     {
-        header('content-type: text/xml; charset=UTF-8');
+        header('content-type: text/xml');
         header('content-disposition: attachment; filename=' . $this->_createFilename());
-        header('content-length: ' . filesize($path));
         echo $path;
         exit(0);
     }
@@ -116,6 +122,9 @@ class ISCExportPlugin extends ImportExportPlugin
             if (!($issue = Repo::issue()->get($issueId, $this->_context->getId()))) {
                 throw new \Exception(__('plugins.importexport.isc.export.failure.loadingIssue', ['issueId' => $issueId]));
             }
+
+            $this->_file_parts[] = 'Volume' . $issue->getVolume();
+            $this->_file_parts[] = 'Issue' . $issue->getNumber();
 
             $output[] = '<JOURNAL>';
             $output[] = '<YEAR>' . $issue->getYear() . '</YEAR>';

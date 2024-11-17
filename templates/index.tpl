@@ -57,6 +57,7 @@
 
 				{fbvFormSection}
 					{fbvElement type="submit" label="plugins.importexport.native.exportIssues" id="exportIssues" name="type" value="download" inline=true}
+					{fbvElement type="submit" label="plugins.importexport.isc.export.text" id="debugIssues" name="type" value="view" inline=true}
 					<input type="button" value="{translate key="plugins.importexport.portico.export.toggleSelection"|escape}" class="pkp_button" onclick="toggleIssues()" />
 				{/fbvFormSection}
 			{/fbvFormArea}

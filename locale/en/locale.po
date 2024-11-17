@@ -13,3 +13,5 @@ msgstr "No issue selected to export"
 msgid "plugins.importexport.isc.export.failure.loadingIssue"
 msgstr "Cannot load issue"
 
+msgid "plugins.importexport.isc.export.text"
+msgstr "Export as Text (for debug)"
