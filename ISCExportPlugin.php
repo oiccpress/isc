@@ -204,9 +204,27 @@ class ISCExportPlugin extends ImportExportPlugin
                 $citationDao = DAORegistry::getDAO('CitationDAO'); /** @var CitationDAO $citationDao */
                 $parsedCitations = $citationDao->getByPublicationId($publication->getId());
                 if($parsedCitations) {
-                    $output[] = '<REF>' . htmlspecialchars( implode('#', $parsedCitations->toArray()), ENT_XML1, 'utf-8') . '</REF>';
+                    $publicationsRaw = $parsedCitations->toArray();
+                    $publicationsString = [];
+                    foreach($publicationsRaw as $publication) {
+                        if(is_string($publication)) {
+                            $publicationsString[] = $publication;
+                        } else {
+                            $publicationsString[] = $publication->getRawCitation();
+                        }
+                    }
+                    $output[] = '<REF>' . htmlspecialchars( implode('#', $publicationsString), ENT_XML1, 'utf-8') . '</REF>';
                 } else {
-                    $output[] = '<REF>' . htmlspecialchars(str_replace("\n", "#", $publication->getData('citationsRaw')), ENT_XML1, 'utf-8') . '</REF>';
+                    $publicationsRaw = $publication->getData('citationsRaw');
+                    $publicationsString = [];
+                    foreach($publicationsRaw as $publication) {
+                        if(is_string($publication)) {
+                            $publicationsString[] = $publication;
+                        } else {
+                            $publicationsString[] = $publication->getRawCitation();
+                        }
+                    }
+                    $output[] = '<REF>' . htmlspecialchars(str_replace("\n", "#", $publicationsString), ENT_XML1, 'utf-8') . '</REF>';
                 }
                 $output[] = '</REFRENCES></REFRENCE>';
 
