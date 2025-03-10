@@ -23,6 +23,7 @@
 <div id="exportTabs">
 	<ul>
 		<li{if $porticoErrorMessage || $porticoSuccessMessage} class="ui-tabs-active"{/if}><a href="#exportIssues-tab">{translate key="plugins.importexport.isc.export.issues"}</a></li>
+		<li><a href="#xmlStatus-tab">{translate key="plugins.importexport.isc.export.xmlStatus"}</a></li>
 		<li><a href="#xmlSetup-tab">{translate key="plugins.importexport.isc.export.xmlSetup"}</a></li>
 	</ul>
 	<div id="xmlSetup-tab">
@@ -32,11 +33,24 @@
 
 			{fbvFormSection title="plugins.importexport.isc.export.xmlSetup"}
 				{fbvElement type="text" name="isc_username" id="isc_username" label="plugins.importexport.isc.export.xmlUsername" value=$isc_username size=$fbvStyles.size.SMALL}
+				<br/>
 				{fbvElement type="text" name="isc_password" id="isc_password" label="plugins.importexport.isc.export.xmlPassword" value=$isc_password size=$fbvStyles.size.SMALL}
 			{/fbvFormSection}
 
 			{fbvFormButtons hideCancel=true submitText="common.save"}
 		</form>
+	</div>
+	<div id="xmlStatus-tab">
+
+		{if !$soapAvailable}
+			<div class="pkpNotification pkpNotification--warning">
+				{translate key="plugins.importexport.isc.export.soapNotAvailable"}
+			</div>
+		{/if}
+	
+		{capture assign=xmlStatusUrl}{plugin_url path="xmlStatus"}{/capture}
+		{load_url_in_div id="xmlStatusBox" url=$xmlStatusUrl}
+
 	</div>
 	<div id="exportIssues-tab">
 		<script>

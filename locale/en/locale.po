@@ -19,6 +19,9 @@ msgstr "Export as Text (for debug)"
 msgid "plugins.importexport.isc.export.toggleSelection"
 msgstr "Select All/None"
 
+msgid "plugins.importexport.isc.export.xmlStatus"
+msgstr "FastXML Status"
+
 msgid "plugins.importexport.isc.export.xmlSetup"
 msgstr "FastXML Settings"
 
@@ -27,3 +30,6 @@ msgstr "FastXML Username (typically Journal Full Name)"
 
 msgid "plugins.importexport.isc.export.xmlPassword"
 msgstr "FastXML Password"
+
+msgid "plugins.importexport.isc.export.soapNotAvailable"
+msgstr "Your website configuration is not compatible with FastXML: You need to enable the SOAP PHP extension"

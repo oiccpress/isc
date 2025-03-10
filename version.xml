@@ -4,13 +4,13 @@
 <!--
   * vplugins/importexport/isc/ersion.xml
   *
-  * Copyright (c) 2024 Invisible Dragon Ltd
+  * Copyright (c) 2025 Invisible Dragon Ltd
   *
   * Plugin version information.
   -->
 <version>
 	<application>isc</application>
 	<type>plugins.importexport</type>
-	<release>1.0</release>
-	<date>2024-11-16</date>
+	<release>2.0</release>
+	<date>2025-03-10</date>
 </version>

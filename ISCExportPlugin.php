@@ -3,7 +3,7 @@
 /**
  * @file plugins/importexport/isc/ISCExportPlugin.php
  *
- * Copyright (c) 2024 Invisible Dragon Ltd
+ * Copyright (c) 2025 Invisible Dragon Ltd
  *
  * @class ISCExportPlugin
  *
@@ -15,6 +15,7 @@ namespace APP\plugins\importexport\isc;
 use APP\core\Application;
 use APP\facades\Repo;
 use APP\notification\NotificationManager;
+use APP\plugins\importexport\isc\controllers\grid\IscExportGridHandler;
 use APP\plugins\PubObjectsExportPlugin;
 use APP\template\TemplateManager;
 use PKP\core\JSONMessage;
@@ -22,6 +23,7 @@ use PKP\core\PKPPageRouter;
 use PKP\db\DAORegistry;
 use PKP\filter\FilterDAO;
 use PKP\notification\PKPNotification;
+use PKP\plugins\Hook;
 use PKP\plugins\ImportExportPlugin;
 
 class ISCExportPlugin extends ImportExportPlugin
@@ -46,6 +48,11 @@ class ISCExportPlugin extends ImportExportPlugin
         ]);
 
         switch ($route = array_shift($args)) {
+            case 'xmlStatus':
+                $client = new IscService($this, $this->_context);
+                $status = $client->getIndexingResult();
+                var_dump($status);
+                break;
             case 'xmlSettings':
                 $this->updateSetting( $this->_context->getId(), 'isc_username', @$_POST['isc_username'] );
                 $this->updateSetting( $this->_context->getId(), 'isc_password', @$_POST['isc_password'] );
@@ -93,6 +100,8 @@ class ISCExportPlugin extends ImportExportPlugin
         if ($value = $this->_context->getLocalizedSetting('abbreviation')) {
             $templateManager->assign('abbreviation', $value);
         }
+
+        $templateManager->assign('soapAvailable', class_exists('SoapClient'));
 
         $templateManager->display($this->getTemplateResource('index.tpl'));
     }
