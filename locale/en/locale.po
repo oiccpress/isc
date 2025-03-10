@@ -15,3 +15,15 @@ msgstr "Cannot load issue"
 
 msgid "plugins.importexport.isc.export.text"
 msgstr "Export as Text (for debug)"
+
+msgid "plugins.importexport.isc.export.toggleSelection"
+msgstr "Select All/None"
+
+msgid "plugins.importexport.isc.export.xmlSetup"
+msgstr "FastXML Settings"
+
+msgid "plugins.importexport.isc.export.xmlUsername"
+msgstr "FastXML Username (typically Journal Full Name)"
+
+msgid "plugins.importexport.isc.export.xmlPassword"
+msgstr "FastXML Password"

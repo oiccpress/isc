@@ -14,8 +14,10 @@ namespace APP\plugins\importexport\isc;
 
 use APP\core\Application;
 use APP\facades\Repo;
+use APP\notification\NotificationManager;
 use APP\plugins\PubObjectsExportPlugin;
 use APP\template\TemplateManager;
+use PKP\core\JSONMessage;
 use PKP\core\PKPPageRouter;
 use PKP\db\DAORegistry;
 use PKP\filter\FilterDAO;
@@ -44,6 +46,14 @@ class ISCExportPlugin extends ImportExportPlugin
         ]);
 
         switch ($route = array_shift($args)) {
+            case 'xmlSettings':
+                $this->updateSetting( $this->_context->getId(), 'isc_username', @$_POST['isc_username'] );
+                $this->updateSetting( $this->_context->getId(), 'isc_password', @$_POST['isc_password'] );
+                $notificationManager = new NotificationManager();
+                $user = $request->getUser();
+                $notificationManager->createTrivialNotification($user->getId());
+                return new JSONMessage(true);
+                break;
             case 'settings':
                 return $this->manage($args, $request);
             case 'export':
@@ -73,6 +83,11 @@ class ISCExportPlugin extends ImportExportPlugin
                 $templateManager->assign('issn', $value);
                 break;
             }
+        }
+
+        foreach([ 'isc_username', 'isc_password' ] as $setting) {
+            $value = $this->getSetting($this->_context->getId(), $setting) ?: '';
+            $templateManager->assign($setting, $value);
         }
 
         if ($value = $this->_context->getLocalizedSetting('abbreviation')) {

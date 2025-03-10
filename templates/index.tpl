@@ -23,14 +23,33 @@
 <div id="exportTabs">
 	<ul>
 		<li{if $porticoErrorMessage || $porticoSuccessMessage} class="ui-tabs-active"{/if}><a href="#exportIssues-tab">{translate key="plugins.importexport.isc.export.issues"}</a></li>
+		<li><a href="#xmlSetup-tab">{translate key="plugins.importexport.isc.export.xmlSetup"}</a></li>
 	</ul>
+	<div id="xmlSetup-tab">
+		<form id="xmlSetupForm" class="pkp_form" action="{plugin_url path="xmlSettings"}" method="post">
+
+			{csrf}
+
+			{fbvFormSection title="plugins.importexport.isc.export.xmlSetup"}
+				{fbvElement type="text" name="isc_username" id="isc_username" label="plugins.importexport.isc.export.xmlUsername" value=$isc_username size=$fbvStyles.size.SMALL}
+				{fbvElement type="text" name="isc_password" id="isc_password" label="plugins.importexport.isc.export.xmlPassword" value=$isc_password size=$fbvStyles.size.SMALL}
+			{/fbvFormSection}
+
+			{fbvFormButtons hideCancel=true submitText="common.save"}
+		</form>
+	</div>
 	<div id="exportIssues-tab">
 		<script>
 			$(function() {ldelim}
 				// Attach the form handler.
-				var form = $('#exportIssuesXmlForm').pkpHandler('$.pkp.controllers.form.FormHandler');
+				let form = $('#exportIssuesXmlForm').pkpHandler('$.pkp.controllers.form.FormHandler');
 				form.find('button[type=submit]').click(function () {
 					form.trigger('unregisterAllForms');
+				});
+
+				let form2 = $('#xmlSetupForm').pkpHandler('$.pkp.controllers.form.AjaxFormHandler');
+				form2.find('button[type=submit]').click(function () {
+					form2.trigger('unregisterAllForms');
 				});
 			{rdelim});
 			{literal}
@@ -58,7 +77,7 @@
 				{fbvFormSection}
 					{fbvElement type="submit" label="plugins.importexport.native.exportIssues" id="exportIssues" name="type" value="download" inline=true}
 					{fbvElement type="submit" label="plugins.importexport.isc.export.text" id="debugIssues" name="type" value="view" inline=true}
-					<input type="button" value="{translate key="plugins.importexport.portico.export.toggleSelection"|escape}" class="pkp_button" onclick="toggleIssues()" />
+					<input type="button" value="{translate key="plugins.importexport.isc.export.toggleSelection"|escape}" class="pkp_button" onclick="toggleIssues()" />
 				{/fbvFormSection}
 			{/fbvFormArea}
 		</form>
