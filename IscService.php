@@ -24,17 +24,21 @@ class IscService {
 
     public function submitIssue($year, $issue, $fileNo, $fileUrl, $filename) {
 
-        $result = $this->client->GetFile_issn([
+        echo "----<br/>";
+        $args = [
             'title' => $this->journalTitle,
             'issn' => $this->issn,
             'lockinfo' => $this->username,
-            'year' => $year,
+            'year' => strval($year),
             'issue' => $issue,
-            'fileNo' => $fileNo,
+            'fileNo' => strval($fileNo),
             'fileUrl' => $fileUrl,
             'filename' => $filename,
             'keyinfo' => $this->password,
-        ]);
+        ];
+        var_dump($args);
+        $result = $this->client->GetFile_issn($args);
+        echo "----<br/>";
         var_dump($result);
 
     }
