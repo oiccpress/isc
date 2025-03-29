@@ -7,7 +7,7 @@ class IscService {
     public const XML_WSDL = 'https://xml.isc.ac/iscServer/ISC_Service_item.svc?wsdl';
 
     protected \SoapClient $client;
-    protected $username, $password;
+    protected $username, $password, $journalTitle, $issn;
 
     public function __construct($plugin, $context) {
 
@@ -16,8 +16,27 @@ class IscService {
         }
 
         $this->client = new \SoapClient(static::XML_WSDL);
+        $this->journalTitle = $plugin->getSetting( $context->getId(), 'isc_journalTitle' );
+        $this->issn = $plugin->getSetting( $context->getId(), 'isc_issn' );
         $this->username = $plugin->getSetting( $context->getId(), 'isc_username' );
         $this->password = $plugin->getSetting( $context->getId(), 'isc_password' );
+    }
+
+    public function submitIssue($year, $issue, $fileNo, $fileUrl, $filename) {
+
+        $result = $this->client->GetFile_issn([
+            'title' => $this->journalTitle,
+            'issn' => $this->issn,
+            'lockinfo' => $this->username,
+            'year' => $year,
+            'issue' => $issue,
+            'fileNo' => $fileNo,
+            'fileUrl' => $fileUrl,
+            'filename' => $filename,
+            'keyinfo' => $this->password,
+        ]);
+        var_dump($result);
+
     }
 
     public function getIndexingResult() {
@@ -37,6 +56,7 @@ class IscService {
         var_dump($result);
 
         // TODO: Get this working and then figure out how to output it!?!
+        // it doesn't seem to return anything right now
 
         die;
 

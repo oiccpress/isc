@@ -19,6 +19,15 @@ msgstr "Export as Text (for debug)"
 msgid "plugins.importexport.isc.export.toggleSelection"
 msgstr "Select All/None"
 
+msgid "plugins.importexport.isc.sendToISC"
+msgstr "Send to ISC"
+
+msgid "plugins.importexport.isc.export.issn"
+msgstr "ISSN - As entered by ISC"
+
+msgid "plugins.importexport.isc.export.journalTitle"
+msgstr "Journal Title - As entered by ISC"
+
 msgid "plugins.importexport.isc.export.xmlStatus"
 msgstr "FastXML Status"
 

@@ -13,18 +13,17 @@
 namespace APP\plugins\importexport\isc;
 
 use APP\core\Application;
+use APP\core\Services;
 use APP\facades\Repo;
+use APP\issue\IssueGalleyDAO;
+use APP\file\IssueFileManager;
+use APP\file\PublicFileManager;
 use APP\notification\NotificationManager;
-use APP\plugins\importexport\isc\controllers\grid\IscExportGridHandler;
-use APP\plugins\PubObjectsExportPlugin;
 use APP\template\TemplateManager;
 use PKP\core\JSONMessage;
-use PKP\core\PKPPageRouter;
 use PKP\db\DAORegistry;
-use PKP\filter\FilterDAO;
-use PKP\notification\PKPNotification;
-use PKP\plugins\Hook;
 use PKP\plugins\ImportExportPlugin;
+use ZipArchive;
 
 class ISCExportPlugin extends ImportExportPlugin
 {
@@ -56,6 +55,8 @@ class ISCExportPlugin extends ImportExportPlugin
             case 'xmlSettings':
                 $this->updateSetting( $this->_context->getId(), 'isc_username', @$_POST['isc_username'] );
                 $this->updateSetting( $this->_context->getId(), 'isc_password', @$_POST['isc_password'] );
+                $this->updateSetting( $this->_context->getId(), 'isc_journalTitle', @$_POST['isc_journalTitle'] );
+                $this->updateSetting( $this->_context->getId(), 'isc_issn', @$_POST['isc_issn'] );
                 $notificationManager = new NotificationManager();
                 $user = $request->getUser();
                 $notificationManager->createTrivialNotification($user->getId());
@@ -69,17 +70,23 @@ class ISCExportPlugin extends ImportExportPlugin
                     $templateManager->assign('iscErrorMessage', __('plugins.importexport.isc.export.failure.noIssueSelected'));
                     break;
                 }
-                try {
-                    // create zip file
-                    $file = $this->_createFile($issueIds);
-                    if ($request->getUserVar('type') == 'view') {
-                        header('content-type: text/plain; charset=UTF-8');
-                        echo $file;
-                        exit();
+
+                if ($request->getUserVar('type') == 'sendToISC') {
+                    foreach($issueIds as $issueId) {
+                        $this->_createZip($request, $issueId);
                     }
-                    $this->_download($file);
-                } catch (\Exception $e) {
-                    $templateManager->assign('iscErrorMessage', $e->getMessage());
+                } else {
+                    try {
+                        $file = $this->_createFile($issueIds);
+                        if ($request->getUserVar('type') == 'view') {
+                            header('content-type: text/plain; charset=UTF-8');
+                            echo $file;
+                            exit();
+                        }
+                        $this->_download($file);
+                    } catch (\Exception $e) {
+                        $templateManager->assign('iscErrorMessage', $e->getMessage());
+                    }
                 }
                 break;
         }
@@ -92,7 +99,7 @@ class ISCExportPlugin extends ImportExportPlugin
             }
         }
 
-        foreach([ 'isc_username', 'isc_password' ] as $setting) {
+        foreach([ 'isc_username', 'isc_password', 'isc_issn', 'isc_journalTitle' ] as $setting) {
             $value = $this->getSetting($this->_context->getId(), $setting) ?: '';
             $templateManager->assign($setting, $value);
         }
@@ -104,6 +111,62 @@ class ISCExportPlugin extends ImportExportPlugin
         $templateManager->assign('soapAvailable', class_exists('SoapClient'));
 
         $templateManager->display($this->getTemplateResource('index.tpl'));
+    }
+
+    private function _createZip($request, $issueId) {
+
+        $publicFileManager = new PublicFileManager();
+        $filename = 'isc_' . $this->_context->getId() . '_' . $issueId . '.zip';
+        $filepath = $publicFileManager->getContextFilesPath($this->_context->getId()) . '/' . $filename;
+        $fileurl = $request->getBaseUrl() . '/' . $publicFileManager->getContextFilesPath($this->_context->getId()) . '/' . $filename;
+
+        var_dump($filepath);
+        var_dump($fileurl);
+        
+        $zip = new ZipArchive();
+        $zip->open( $filepath, ZipArchive::CREATE | ZipArchive::OVERWRITE );
+
+        // Add XML
+        $file = $this->_createFile([ $issueId ]);
+        $zip->addFromString( 'index.xml', $file );
+
+        $i = 1;
+
+        $submissionCollector = Repo::submission()->getCollector();
+        $submissions = $submissionCollector
+            ->filterByContextIds([$this->_context->getId()])
+            ->filterByIssueIds([$issueId])
+            ->orderBy($submissionCollector::ORDERBY_SEQUENCE, $submissionCollector::ORDER_DIR_ASC)
+            ->getMany();
+        foreach ($submissions as $article) {
+
+            // add galleys
+            $fileService = Services::get('file');
+            foreach ($article->getGalleys() as $galley) {
+                $submissionFile = Repo::submissionFile()->get($galley->getData('submissionFileId'));
+                if (!$submissionFile) {
+                    continue;
+                }
+
+                if($galley->getLabel() != 'PDF') continue;
+
+                $filePath = $fileService->get($submissionFile->getData('fileId'))->path;
+                if (!$zip->addFromString($i . '.pdf', $fileService->fs->read($filePath))) {
+                    error_log("Unable add file ${filePath} to Portico ZIP");
+                    throw new \Exception(__('plugins.importexport.portico.export.failure.creatingFile'));
+                }
+                $i += 1;
+            }
+
+        }
+
+        $zip->close();
+
+        // Send to ISC
+        $issue = Repo::issue()->get($issueId);
+        $client = new IscService($this, $this->_context);
+        $client->submitIssue( $issue->getYear(), $issue->getNumber(), $i, $fileurl, $filename );
+        
     }
 
     /**

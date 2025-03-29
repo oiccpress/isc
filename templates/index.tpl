@@ -32,6 +32,10 @@
 			{csrf}
 
 			{fbvFormSection title="plugins.importexport.isc.export.xmlSetup"}
+				{fbvElement type="text" name="isc_issn" id="isc_issn" label="plugins.importexport.isc.export.issn" value=$isc_issn size=$fbvStyles.size.SMALL}
+				<br/>
+				{fbvElement type="text" name="isc_journalTitle" id="isc_journalTitle" label="plugins.importexport.isc.export.journalTitle" value=$isc_journalTitle size=$fbvStyles.size.SMALL}
+				<br/>
 				{fbvElement type="text" name="isc_username" id="isc_username" label="plugins.importexport.isc.export.xmlUsername" value=$isc_username size=$fbvStyles.size.SMALL}
 				<br/>
 				{fbvElement type="text" name="isc_password" id="isc_password" label="plugins.importexport.isc.export.xmlPassword" value=$isc_password size=$fbvStyles.size.SMALL}
@@ -89,6 +93,7 @@
 				{load_url_in_div id="issuesListGridContainer" url=$issuesListGridUrl}
 
 				{fbvFormSection}
+					{fbvElement type="submit" label="plugins.importexport.isc.sendToISC" id="sendToISC" name="type" value="sendToISC" inline=true}
 					{fbvElement type="submit" label="plugins.importexport.native.exportIssues" id="exportIssues" name="type" value="download" inline=true}
 					{fbvElement type="submit" label="plugins.importexport.isc.export.text" id="debugIssues" name="type" value="view" inline=true}
 					<input type="button" value="{translate key="plugins.importexport.isc.export.toggleSelection"|escape}" class="pkp_button" onclick="toggleIssues()" />
