@@ -42,3 +42,33 @@ msgstr "FastXML Password"
 
 msgid "plugins.importexport.isc.export.soapNotAvailable"
 msgstr "Your website configuration is not compatible with FastXML: You need to enable the SOAP PHP extension"
+
+msgid "plugins.importexport.isc.iscStatus"
+msgstr "FastXML Status"
+
+msgid "plugins.importexport.isc.fetchIscStatus"
+msgstr "Check Status"
+
+msgid "plugins.importexport.isc.export.sentToIsc"
+msgstr "Sent issues to ISC"
+
+msgid "plugins.importexport.isc.export.xmlEmptyStatus"
+msgstr "There is currently no status information for this issue. If this issue was recently submitted, it will be under review by the ISC and information will be available once the review has been completed"
+
+msgid "plugins.importexport.isc.export.submitted"
+msgstr "Submitted"
+
+msgid "plugins.importexport.isc.export.notSubmitted"
+msgstr "Not Submitted"
+
+msgid "plugins.importexport.isc.export.pubYear"
+msgstr "PubYear"
+
+msgid "plugins.importexport.isc.export.volume"
+msgstr "Volume"
+
+msgid "plugins.importexport.isc.export.issue"
+msgstr "Issue"
+
+msgid "plugins.importexport.isc.export.comment"
+msgstr "Comments"

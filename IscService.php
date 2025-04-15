@@ -4,7 +4,7 @@ namespace APP\plugins\importexport\isc;
 
 class IscService {
 
-    public const XML_WSDL = 'https://xml.isc.ac/iscServer/ISC_Service_item.svc?wsdl';
+    public const XML_WSDL = 'https://xml.isc.ac/iscServer/ISC_Service_item.svc?singleWsdl';
 
     protected \SoapClient $client;
     protected $username, $password, $journalTitle, $issn;
@@ -22,47 +22,53 @@ class IscService {
         $this->password = $plugin->getSetting( $context->getId(), 'isc_password' );
     }
 
-    public function submitIssue($year, $issue, $fileNo, $fileUrl, $filename) {
+    public function submitIssue($year, $volume, $issue, $fileNo, $fileUrl, $filename) {
 
-        echo "----<br/>";
         $args = [
             'title' => $this->journalTitle,
             'issn' => $this->issn,
             'lockinfo' => $this->username,
             'year' => strval($year),
             'issue' => $issue,
+            'vol' => $volume,
             'fileNo' => strval($fileNo),
             'fileUrl' => $fileUrl,
             'filename' => $filename,
             'keyinfo' => $this->password,
         ];
-        var_dump($args);
         $result = $this->client->GetFile_issn($args);
-        echo "----<br/>";
-        var_dump($result);
+        /*
+        Successful result:
+        object(stdClass)#1314 (1) { ["GetFile_issnResult"]=> string(7) "Success" } 
+        */
+        return $result;
 
     }
 
-    public function getIndexingResult() {
+    public function getIndexingResult($year, $volume, $issue) {
 
-        $result = $this->client->GetIndexingResult([
+        $args = [
             'lockinfo' => $this->username,
             'keyinfo' => $this->password,
-            'issn' => '',
-            'year' => '',
-            'vol' => '',
-            'issue' => '',
-        ]);
+            'issn' => $this->issn,
+            'year' => $year,
+            'vol' => $volume,
+            'issue' => $issue,
+        ];
 
-        var_dump($this->username);
-        var_dump($this->password);
+        $result = $this->client->GetIndexingResult($args);
 
-        var_dump($result);
+        if(is_object($result)) {
 
-        // TODO: Get this working and then figure out how to output it!?!
-        // it doesn't seem to return anything right now
+            if($result->GetIndexingResultResult) {
+                return json_decode($result->GetIndexingResultResult, true);
+            }
 
-        die;
+        } else {
+            return null;
+        }
+        return null;
+
 
     }
 

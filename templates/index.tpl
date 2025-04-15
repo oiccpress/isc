@@ -23,7 +23,6 @@
 <div id="exportTabs">
 	<ul>
 		<li{if $porticoErrorMessage || $porticoSuccessMessage} class="ui-tabs-active"{/if}><a href="#exportIssues-tab">{translate key="plugins.importexport.isc.export.issues"}</a></li>
-		<li><a href="#xmlStatus-tab">{translate key="plugins.importexport.isc.export.xmlStatus"}</a></li>
 		<li><a href="#xmlSetup-tab">{translate key="plugins.importexport.isc.export.xmlSetup"}</a></li>
 	</ul>
 	<div id="xmlSetup-tab">
@@ -44,19 +43,14 @@
 			{fbvFormButtons hideCancel=true submitText="common.save"}
 		</form>
 	</div>
-	<div id="xmlStatus-tab">
+	<div id="exportIssues-tab">
 
 		{if !$soapAvailable}
 			<div class="pkpNotification pkpNotification--warning">
 				{translate key="plugins.importexport.isc.export.soapNotAvailable"}
 			</div>
 		{/if}
-	
-		{capture assign=xmlStatusUrl}{plugin_url path="xmlStatus"}{/capture}
-		{load_url_in_div id="xmlStatusBox" url=$xmlStatusUrl}
 
-	</div>
-	<div id="exportIssues-tab">
 		<script>
 			$(function() {ldelim}
 				// Attach the form handler.
@@ -89,7 +83,7 @@
 					<p><span class="pkp_form_success">{$iscSuccessMessage|escape}</strong></p>
 				{/if}
 
-				{capture assign=issuesListGridUrl}{url router=$smarty.const.ROUTE_COMPONENT component="grid.issues.ExportableIssuesListGridHandler" op="fetchGrid" escape=false}{/capture}
+				{capture assign=issuesListGridUrl}{plugin_url path="fetchGrid"}{/capture}
 				{load_url_in_div id="issuesListGridContainer" url=$issuesListGridUrl}
 
 				{fbvFormSection}

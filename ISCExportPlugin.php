@@ -19,9 +19,11 @@ use APP\issue\IssueGalleyDAO;
 use APP\file\IssueFileManager;
 use APP\file\PublicFileManager;
 use APP\notification\NotificationManager;
+use APP\plugins\importexport\isc\grid\ISCExportableIssuesListGridHandler;
 use APP\template\TemplateManager;
 use PKP\core\JSONMessage;
 use PKP\db\DAORegistry;
+use PKP\plugins\Hook;
 use PKP\plugins\ImportExportPlugin;
 use ZipArchive;
 
@@ -47,10 +49,21 @@ class ISCExportPlugin extends ImportExportPlugin
         ]);
 
         switch ($route = array_shift($args)) {
+            case 'fetchGrid':
+                $handler = new ISCExportableIssuesListGridHandler($this);
+                $handler->setDispatcher( $request->getDispatcher() );
+                $handler->initialize($request, $args);
+                return $handler->fetchGrid($args, $request);
+                break;
             case 'xmlStatus':
                 $client = new IscService($this, $this->_context);
-                $status = $client->getIndexingResult();
-                var_dump($status);
+                $issue = Repo::issue()->get($_GET['issueId'], $this->_context->getId());
+                if(!$issue) {
+                    return new JSONMessage(false, 'Cannot get issue!');
+                }
+                $status = $client->getIndexingResult( $issue->getYear(), $issue->getVolume(), $issue->getNumber() );
+                $templateManager->assign('indexingResult', $status);
+                return $templateManager->fetchJson($this->getTemplateResource('indexingResult.tpl'));
                 break;
             case 'xmlSettings':
                 $this->updateSetting( $this->_context->getId(), 'isc_username', @$_POST['isc_username'] );
@@ -75,6 +88,7 @@ class ISCExportPlugin extends ImportExportPlugin
                     foreach($issueIds as $issueId) {
                         $this->_createZip($request, $issueId);
                     }
+                    $templateManager->assign('iscSuccessMessage', __('plugins.importexport.isc.export.sentToIsc'));
                 } else {
                     try {
                         $file = $this->_createFile($issueIds);
@@ -119,9 +133,6 @@ class ISCExportPlugin extends ImportExportPlugin
         $filename = 'isc_' . $this->_context->getId() . '_' . $issueId . '.zip';
         $filepath = $publicFileManager->getContextFilesPath($this->_context->getId()) . '/' . $filename;
         $fileurl = $request->getBaseUrl() . '/' . $publicFileManager->getContextFilesPath($this->_context->getId()) . '/' . $filename;
-
-        var_dump($filepath);
-        var_dump($fileurl);
         
         $zip = new ZipArchive();
         $zip->open( $filepath, ZipArchive::CREATE | ZipArchive::OVERWRITE );
@@ -165,8 +176,10 @@ class ISCExportPlugin extends ImportExportPlugin
         // Send to ISC
         $issue = Repo::issue()->get($issueId);
         $client = new IscService($this, $this->_context);
-        $client->submitIssue( $issue->getYear(), $issue->getNumber(), $i, $fileurl, $filename );
+        $client->submitIssue( $issue->getYear(), $issue->getVolume(), $issue->getNumber(), $i, $fileurl, $filename );
         
+        $this->updateSetting( $this->_context->getId(), 'isc_submitted_' . $issue->getId(), 1 );
+
     }
 
     /**
@@ -313,7 +326,7 @@ class ISCExportPlugin extends ImportExportPlugin
                     }
                     $output[] = '<REF>' . htmlspecialchars(str_replace("\n", "#", $publicationsString), ENT_XML1, 'utf-8') . '</REF>';
                 }
-                $output[] = '</REFRENCES></REFRENCE>';
+                $output[] = '</REFRENCE></REFRENCES>';
 
                 $output[] = '</ARTICLE>';
 
@@ -358,6 +371,7 @@ class ISCExportPlugin extends ImportExportPlugin
     {
         $isRegistered = parent::register($category, $path, $mainContextId);
         $this->addLocaleData();
+        
         return $isRegistered;
     }
 
