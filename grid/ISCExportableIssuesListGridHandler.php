@@ -24,7 +24,8 @@ class ISCExportableIssuesListGridHandler extends ExportableIssuesListGridHandler
     {
         $journal = $request->getJournal();
 
-        // Handle grid paging (deprecated style)
+        // Removed grid paging and just display all of them in 1 page -- this is as
+        // paging URLs won't be displayed correctly
 
         $rangeInfo = $this->getGridRangeInfo($request, $this->getId());
         $collector = Repo::issue()->getCollector()
@@ -39,6 +40,8 @@ class ISCExportableIssuesListGridHandler extends ExportableIssuesListGridHandler
      */
     public function initFeatures($request, $args)
     {
+        // Removed grid paging and just display all of them in 1 page -- this is as
+        // paging URLs won't be displayed correctly
         return [new SelectableItemsFeature()];
     }
 
@@ -47,6 +50,7 @@ class ISCExportableIssuesListGridHandler extends ExportableIssuesListGridHandler
      
         parent::initialize($request, $args);
 
+        // Add in our new grid item for displaying status
         $issueGridCellProvider = new IssueGridCellProvider($this->plugin);
 
         // Issue identification

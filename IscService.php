@@ -57,6 +57,10 @@ class IscService {
         ];
 
         $result = $this->client->GetIndexingResult($args);
+        /*
+        Successful result:
+        object(stdClass)#1314 (1) { ["GetIndexingResultResult"]=> string(7) "[{...json...}]" } 
+        */
 
         if(is_object($result)) {
 

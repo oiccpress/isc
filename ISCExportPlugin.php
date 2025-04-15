@@ -50,12 +50,16 @@ class ISCExportPlugin extends ImportExportPlugin
 
         switch ($route = array_shift($args)) {
             case 'fetchGrid':
+                // This gets OJS to force a grid to be displayed when it's only
+                // in the strange way export plugins are loaded on-demand only
                 $handler = new ISCExportableIssuesListGridHandler($this);
                 $handler->setDispatcher( $request->getDispatcher() );
                 $handler->initialize($request, $args);
                 return $handler->fetchGrid($args, $request);
                 break;
             case 'xmlStatus':
+                // Fetch XML status of an issue from the API and render it
+                // for frontend to display nicely in a table
                 $client = new IscService($this, $this->_context);
                 $issue = Repo::issue()->get($_GET['issueId'], $this->_context->getId());
                 if(!$issue) {
@@ -163,8 +167,8 @@ class ISCExportPlugin extends ImportExportPlugin
 
                 $filePath = $fileService->get($submissionFile->getData('fileId'))->path;
                 if (!$zip->addFromString($i . '.pdf', $fileService->fs->read($filePath))) {
-                    error_log("Unable add file ${filePath} to Portico ZIP");
-                    throw new \Exception(__('plugins.importexport.portico.export.failure.creatingFile'));
+                    error_log("Unable add file {$filePath} to ISC ZIP");
+                    throw new \Exception(__('plugins.importexport.isc.export.failure.creatingFile'));
                 }
                 $i += 1;
             }
@@ -178,6 +182,8 @@ class ISCExportPlugin extends ImportExportPlugin
         $client = new IscService($this, $this->_context);
         $client->submitIssue( $issue->getYear(), $issue->getVolume(), $issue->getNumber(), $i, $fileurl, $filename );
         
+        // We use plugin setting storage as we can't add anything to the Journal
+        // schema (as we're only loaded temporarily), so this workaround will need to do.
         $this->updateSetting( $this->_context->getId(), 'isc_submitted_' . $issue->getId(), 1 );
 
     }

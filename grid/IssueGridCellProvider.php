@@ -67,6 +67,8 @@ class IssueGridCellProvider extends GridCellProvider
 
         switch ($columnId) {
             case 'iscStatus':
+                // We use plugin setting storage as we can't add anything to the Journal
+                // schema (as we're only loaded temporarily), so this workaround will need to do.
                 $status = $this->plugin->getSetting( $issue->getJournalId(), 'isc_submitted_' . $issue->getId() );
                 return ['label' => $status ? __('plugins.importexport.isc.export.submitted') : __('plugins.importexport.isc.export.notSubmitted')];
             default: assert(false);
