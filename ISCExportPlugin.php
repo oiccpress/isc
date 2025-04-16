@@ -338,7 +338,7 @@ class ISCExportPlugin extends ImportExportPlugin
 
             }
 
-            $output[] = '</ARTICLES>';
+            $output[] = '</ARTICLES></JOURNAL>';
         }
 
         $output[] = '</XML>';
