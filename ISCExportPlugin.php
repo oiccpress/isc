@@ -34,6 +34,8 @@ class ISCExportPlugin extends ImportExportPlugin
 
     private $_file_parts = [];
 
+    private $_warnings = [];
+
     /**
      * @copydoc ImportExportPlugin::display()
      */
@@ -96,6 +98,12 @@ class ISCExportPlugin extends ImportExportPlugin
                 } else {
                     try {
                         $file = $this->_createFile($issueIds);
+                        if(!empty($this->_warnings)) {
+                            echo '<pre><p>Problems producing XML:</p>';
+                            var_dump($this->_warnings);
+                            echo '</pre>';
+                            exit;
+                        }
                         if ($request->getUserVar('type') == 'view') {
                             header('content-type: text/plain; charset=UTF-8');
                             echo $file;
@@ -232,7 +240,7 @@ class ISCExportPlugin extends ImportExportPlugin
             $this->_file_parts[] = 'Volume' . $issue->getVolume();
             $this->_file_parts[] = 'Issue' . $issue->getNumber();
 
-            $output[] = '<JOURNAL>';
+            $output[] = '<ISCJOURNAL>';
             $output[] = '<YEAR>' . $issue->getYear() . '</YEAR>';
             $output[] = '<VOL>' . $issue->getVolume() . '</VOL>';
             $output[] = '<NO>' . $issue->getNumber() . '</NO>';
@@ -270,7 +278,12 @@ class ISCExportPlugin extends ImportExportPlugin
                 $pages = $publication->getData('pages');
                 if($pages) {
                     $pages = explode("-", $pages);
+                    if(count($pages) === 1) {
+                        $pages = [ $pages, $pages ];
+                    }
                     $output[] = '<PAGES><PAGE><FPAGE>' . trim($pages[0]) . '</FPAGE><TPAGE>' . trim($pages[1]) . '</TPAGE></PAGE></PAGES>';
+                } else {
+                    $this->_warnings[]= 'No pages associated with publication ' . $publication->getLocalizedFullTitle();
                 }
 
                 $output[] = '<AUTHORS>';
@@ -338,7 +351,7 @@ class ISCExportPlugin extends ImportExportPlugin
 
             }
 
-            $output[] = '</ARTICLES></JOURNAL>';
+            $output[] = '</ARTICLES></ISCJOURNAL>';
         }
 
         $output[] = '</XML>';
