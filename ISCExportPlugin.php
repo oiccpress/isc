@@ -283,7 +283,7 @@ class ISCExportPlugin extends ImportExportPlugin
                     }
                     $output[] = '<PAGES><PAGE><FPAGE>' . trim($pages[0]) . '</FPAGE><TPAGE>' . trim($pages[1]) . '</TPAGE></PAGE></PAGES>';
                 } else {
-                    $this->_warnings[]= 'No pages associated with publication ' . $publication->getLocalizedFullTitle();
+                    $output[] = '<PAGES><PAGE><FPAGE></FPAGE><TPAGE></TPAGE></PAGE></PAGES>';
                 }
 
                 $output[] = '<AUTHORS>';
@@ -332,7 +332,7 @@ class ISCExportPlugin extends ImportExportPlugin
                             $publicationsString[] = $publication->getRawCitation();
                         }
                     }
-                    $output[] = '<REF>' . htmlspecialchars( implode('#', $publicationsString), ENT_XML1, 'utf-8') . '</REF>';
+                    $output[] = '<REF>' . htmlspecialchars( implode('##', $publicationsString), ENT_XML1, 'utf-8') . '##</REF>';
                 } else {
                     $publicationsRaw = $publication->getData('citationsRaw');
                     $publicationsString = [];
@@ -343,7 +343,7 @@ class ISCExportPlugin extends ImportExportPlugin
                             $publicationsString[] = $publication->getRawCitation();
                         }
                     }
-                    $output[] = '<REF>' . htmlspecialchars(str_replace("\n", "#", $publicationsString), ENT_XML1, 'utf-8') . '</REF>';
+                    $output[] = '<REF>' . htmlspecialchars(str_replace("\n", "##", $publicationsString), ENT_XML1, 'utf-8') . '##</REF>';
                 }
                 $output[] = '</REFRENCE></REFRENCES>';
 
