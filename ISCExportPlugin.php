@@ -298,7 +298,15 @@ class ISCExportPlugin extends ImportExportPlugin
 						'<MidNameE></MidNameE>',	
 						'<FamilyE>' . htmlspecialchars($author->getFamilyName('en'), ENT_XML1, 'utf-8') . '</FamilyE>',
                         '<Organizations>',
-						'<Organization>' . htmlspecialchars($author->getLocalizedAffiliation(), ENT_XML1, 'utf-8') . '</Organization>',
+                    ];
+
+                    $orgs = explode(" AND ", $author->getLocalizedAffiliation());
+                    foreach($orgs as $org) {
+                        $org = trim($org, '" ');
+                        $element[] = '<Organization>' . htmlspecialchars($org, ENT_XML1, 'utf-8') . '</Organization>';
+                    }
+
+                    array_push($element,
 						'</Organizations>',
 						'<Countries>',
 						'<Country>' . htmlspecialchars($author->getCountryLocalized(), ENT_XML1, 'utf-8') . '</Country>',
@@ -307,7 +315,7 @@ class ISCExportPlugin extends ImportExportPlugin
 						'<Email>' . htmlspecialchars($author->getEmail(), ENT_XML1, 'utf-8') . '</Email>',			
 						'</EMAILS>',
                         '</AUTHOR>',
-                    ];
+                    );
                     $output[] = ' ' . implode("\n ", $element);
                 }
                 $output[] = '</AUTHORS>';
