@@ -188,7 +188,8 @@ class ISCExportPlugin extends ImportExportPlugin
         // Send to ISC
         $issue = Repo::issue()->get($issueId);
         $client = new IscService($this, $this->_context);
-        $client->submitIssue( $issue->getYear(), $issue->getVolume(), $issue->getNumber(), $i, $fileurl, $filename );
+        $resp = $client->submitIssue( $issue->getYear(), $issue->getVolume(), $issue->getNumber(), $i, $fileurl, $filename );
+        var_dump($resp);
         
         // We use plugin setting storage as we can't add anything to the Journal
         // schema (as we're only loaded temporarily), so this workaround will need to do.
@@ -300,10 +301,13 @@ class ISCExportPlugin extends ImportExportPlugin
                         '<Organizations>',
                     ];
 
-                    $orgs = explode(" AND ", $author->getLocalizedAffiliation());
-                    foreach($orgs as $org) {
-                        $org = trim($org, '" ');
-                        $element[] = '<Organization>' . htmlspecialchars($org, ENT_XML1, 'utf-8') . '</Organization>';
+                    $authorAffiliations = $author->getAffiliations();
+                    foreach($authorAffiliations as $affiliation) {
+                        $orgs = explode(" AND ", $affiliation->getLocalizedName());
+                        foreach($orgs as $org) {
+                            $org = trim($org, '" ');
+                            $element[] = '<Organization>' . htmlspecialchars($org, ENT_XML1, 'utf-8') . '</Organization>';
+                        }
                     }
 
                     array_push($element,
